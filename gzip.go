@@ -5,16 +5,17 @@
 package gzip
 
 import (
-	"compress/flate"
 	"errors"
 	"fmt"
 	"hash/crc32"
 	"io"
 	"time"
+
+	"github.com/lel-amri/zran/internal/flate"
 )
 
 // These constants are copied from the flate package, so that code that imports
-// "compress/gzip" does not also have to import "compress/flate".
+// "github.com/lel-amri/zran" does not also have to import "github.com/lel-amri/zran/internal/flate".
 const (
 	NoCompression      = flate.NoCompression
 	BestSpeed          = flate.BestSpeed

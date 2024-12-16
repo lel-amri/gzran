@@ -6,13 +6,14 @@ package gzip
 
 import (
 	"bytes"
-	"compress/flate"
 	"encoding/base64"
 	"io"
 	"os"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/lel-amri/zran/internal/flate"
 )
 
 type gunzipTest struct {

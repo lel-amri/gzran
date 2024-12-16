@@ -8,7 +8,6 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"internal/testenv"
 	"io"
 	"math/rand"
 	"os"
@@ -383,7 +382,7 @@ var deflateInflateStringTests = []deflateInflateStringTest{
 
 func TestDeflateInflateString(t *testing.T) {
 	t.Parallel()
-	if testing.Short() && testenv.Builder() == "" {
+	if testing.Short() && true {
 		t.Skip("skipping in short mode")
 	}
 	for _, test := range deflateInflateStringTests {
