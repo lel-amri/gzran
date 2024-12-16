@@ -25,74 +25,74 @@ package flate
 // checks about the arguments. As such, the invariants documented for each
 // method call must be respected.
 type dictDecoder struct {
-	hist []byte // Sliding window history
+	Hist []byte // Sliding window history
 
-	// Invariant: 0 <= rdPos <= wrPos <= len(hist)
-	wrPos int  // Current output position in buffer
-	rdPos int  // Have emitted hist[:rdPos] already
-	full  bool // Has a full window length been written yet?
+	// Invariant: 0 <= rdPos <= WrPos <= len(hist)
+	WrPos int  // Current output position in buffer
+	RdPos int  // Have emitted hist[:rdPos] already
+	Full  bool // Has a full window length been written yet?
 }
 
 // init initializes dictDecoder to have a sliding window dictionary of the given
 // size. If a preset dict is provided, it will initialize the dictionary with
 // the contents of dict.
 func (dd *dictDecoder) init(size int, dict []byte) {
-	*dd = dictDecoder{hist: dd.hist}
+	*dd = dictDecoder{Hist: dd.Hist}
 
-	if cap(dd.hist) < size {
-		dd.hist = make([]byte, size)
+	if cap(dd.Hist) < size {
+		dd.Hist = make([]byte, size)
 	}
-	dd.hist = dd.hist[:size]
+	dd.Hist = dd.Hist[:size]
 
-	if len(dict) > len(dd.hist) {
-		dict = dict[len(dict)-len(dd.hist):]
+	if len(dict) > len(dd.Hist) {
+		dict = dict[len(dict)-len(dd.Hist):]
 	}
-	dd.wrPos = copy(dd.hist, dict)
-	if dd.wrPos == len(dd.hist) {
-		dd.wrPos = 0
-		dd.full = true
+	dd.WrPos = copy(dd.Hist, dict)
+	if dd.WrPos == len(dd.Hist) {
+		dd.WrPos = 0
+		dd.Full = true
 	}
-	dd.rdPos = dd.wrPos
+	dd.RdPos = dd.WrPos
 }
 
 // histSize reports the total amount of historical data in the dictionary.
 func (dd *dictDecoder) histSize() int {
-	if dd.full {
-		return len(dd.hist)
+	if dd.Full {
+		return len(dd.Hist)
 	}
-	return dd.wrPos
+	return dd.WrPos
 }
 
 // availRead reports the number of bytes that can be flushed by readFlush.
 func (dd *dictDecoder) availRead() int {
-	return dd.wrPos - dd.rdPos
+	return dd.WrPos - dd.RdPos
 }
 
 // availWrite reports the available amount of output buffer space.
 func (dd *dictDecoder) availWrite() int {
-	return len(dd.hist) - dd.wrPos
+	return len(dd.Hist) - dd.WrPos
 }
 
 // writeSlice returns a slice of the available buffer to write data to.
 //
 // This invariant will be kept: len(s) <= availWrite()
 func (dd *dictDecoder) writeSlice() []byte {
-	return dd.hist[dd.wrPos:]
+	return dd.Hist[dd.WrPos:]
 }
 
 // writeMark advances the writer pointer by cnt.
 //
 // This invariant must be kept: 0 <= cnt <= availWrite()
 func (dd *dictDecoder) writeMark(cnt int) {
-	dd.wrPos += cnt
+	dd.WrPos += cnt
 }
 
 // writeByte writes a single byte to the dictionary.
 //
 // This invariant must be kept: 0 < availWrite()
 func (dd *dictDecoder) writeByte(c byte) {
-	dd.hist[dd.wrPos] = c
-	dd.wrPos++
+	dd.Hist[dd.WrPos] = c
+	dd.WrPos++
 }
 
 // writeCopy copies a string at a given (dist, length) to the output.
@@ -101,12 +101,12 @@ func (dd *dictDecoder) writeByte(c byte) {
 //
 // This invariant must be kept: 0 < dist <= histSize()
 func (dd *dictDecoder) writeCopy(dist, length int) int {
-	dstBase := dd.wrPos
+	dstBase := dd.WrPos
 	dstPos := dstBase
 	srcPos := dstPos - dist
 	endPos := dstPos + length
-	if endPos > len(dd.hist) {
-		endPos = len(dd.hist)
+	if endPos > len(dd.Hist) {
+		endPos = len(dd.Hist)
 	}
 
 	// Copy non-overlapping section after destination position.
@@ -117,8 +117,8 @@ func (dd *dictDecoder) writeCopy(dist, length int) int {
 	// Thus, a backwards copy is performed here; that is, the exact bytes in
 	// the source prior to the copy is placed in the destination.
 	if srcPos < 0 {
-		srcPos += len(dd.hist)
-		dstPos += copy(dd.hist[dstPos:endPos], dd.hist[srcPos:])
+		srcPos += len(dd.Hist)
+		dstPos += copy(dd.Hist[dstPos:endPos], dd.Hist[srcPos:])
 		srcPos = 0
 	}
 
@@ -137,10 +137,10 @@ func (dd *dictDecoder) writeCopy(dist, length int) int {
 	//	dstPos = endPos
 	//
 	for dstPos < endPos {
-		dstPos += copy(dd.hist[dstPos:endPos], dd.hist[srcPos:dstPos])
+		dstPos += copy(dd.Hist[dstPos:endPos], dd.Hist[srcPos:dstPos])
 	}
 
-	dd.wrPos = dstPos
+	dd.WrPos = dstPos
 	return dstPos - dstBase
 }
 
@@ -151,9 +151,9 @@ func (dd *dictDecoder) writeCopy(dist, length int) int {
 //
 // This invariant must be kept: 0 < dist <= histSize()
 func (dd *dictDecoder) tryWriteCopy(dist, length int) int {
-	dstPos := dd.wrPos
+	dstPos := dd.WrPos
 	endPos := dstPos + length
-	if dstPos < dist || endPos > len(dd.hist) {
+	if dstPos < dist || endPos > len(dd.Hist) {
 		return 0
 	}
 	dstBase := dstPos
@@ -161,10 +161,10 @@ func (dd *dictDecoder) tryWriteCopy(dist, length int) int {
 
 	// Copy possibly overlapping section before destination position.
 	for dstPos < endPos {
-		dstPos += copy(dd.hist[dstPos:endPos], dd.hist[srcPos:dstPos])
+		dstPos += copy(dd.Hist[dstPos:endPos], dd.Hist[srcPos:dstPos])
 	}
 
-	dd.wrPos = dstPos
+	dd.WrPos = dstPos
 	return dstPos - dstBase
 }
 
@@ -172,11 +172,11 @@ func (dd *dictDecoder) tryWriteCopy(dist, length int) int {
 // emitted to the user. The data returned by readFlush must be fully consumed
 // before calling any other dictDecoder methods.
 func (dd *dictDecoder) readFlush() []byte {
-	toRead := dd.hist[dd.rdPos:dd.wrPos]
-	dd.rdPos = dd.wrPos
-	if dd.wrPos == len(dd.hist) {
-		dd.wrPos, dd.rdPos = 0, 0
-		dd.full = true
+	toRead := dd.Hist[dd.RdPos:dd.WrPos]
+	dd.RdPos = dd.WrPos
+	if dd.WrPos == len(dd.Hist) {
+		dd.WrPos, dd.RdPos = 0, 0
+		dd.Full = true
 	}
 	return toRead
 }

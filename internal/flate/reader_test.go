@@ -6,6 +6,7 @@ package flate
 
 import (
 	"bytes"
+	stdflate "compress/flate"
 	"io"
 	"os"
 	"runtime"
@@ -38,7 +39,7 @@ func BenchmarkDecode(b *testing.B) {
 		b.SetBytes(int64(n))
 
 		compressed := new(bytes.Buffer)
-		w, err := NewWriter(compressed, level)
+		w, err := stdflate.NewWriter(compressed, level)
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -63,10 +64,10 @@ var levelTests = []struct {
 	name  string
 	level int
 }{
-	{"Huffman", HuffmanOnly},
-	{"Speed", BestSpeed},
-	{"Default", DefaultCompression},
-	{"Compression", BestCompression},
+	{"Huffman", stdflate.HuffmanOnly},
+	{"Speed", stdflate.BestSpeed},
+	{"Default", stdflate.DefaultCompression},
+	{"Compression", stdflate.BestCompression},
 }
 
 var sizes = []struct {

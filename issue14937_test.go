@@ -1,4 +1,4 @@
-package gzip
+package zran
 
 import (
 	"io/fs"
