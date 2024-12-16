@@ -23,7 +23,7 @@ upstream_tags="$(git -C "$workrepo" ls-remote --tags origin | tail -n +2 | cut -
 { printf '%s\n' "$upstream_branches" | sed 's~^\(.*\)$~+refs/heads/\1:refs/heads/\1~' ; printf '%s\n' "$upstream_tags" | sed 's~^\(.*\)$~+refs/tags/\1:refs/tags/\1~' ; } | xargs git -C "$workrepo" fetch -fn origin
 
 # Filter the local working repository
-git -C "$workrepo" filter-repo --path-match src/compress/flate --path-match src/pkg/compress/flate --path-match src/lib/compress/flate --force
+git -C "$workrepo" filter-repo --path-regex 'src/(pkg/|lib/)?compress/(flate|gzip)' --path-regex 'src/(pkg/|lib/)?compress/testdata/e\.txt' --path-match src/testdata/Isaac\.Newton-Opticks.txt --force
 
 # Fetch upstream branches and tags to local working repository
 { printf '%s\n' "$upstream_branches" | sed 's~^\(.*\)$~+refs/heads/\1:refs/heads/upstream/\1~' ; printf '%s\n' "$upstream_tags" | sed 's~^\(.*\)$~+refs/tags/\1:refs/tags/upstream/\1~' ; } | xargs git fetch -fn "$workrepo"
