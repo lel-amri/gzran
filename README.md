@@ -14,6 +14,18 @@ Branches starting with `upstream/` are upstream branches filtered with
 
 Other branches are the Go zran implementation over upstream branches.
 
+## How to prepare upstream code
+
+You can create the upstream branches by running the `create-upstream-image.sh`
+script.
+
+For each upstream branch, you will want to run the `patch-stage1.sh` script
+then the `patch-stage2.sh` script. You can then work on top of that to
+implement the zran functionnality.
+
+All these scripts accept environment variables `GIT`, `GOPLS` and `GOFMT`
+to specify replacement for `git`, `gopls` and `gofmt` commands respectively.
+
 [^1]: https://github.com/timpalpant/gzran/tree/master
 
 [^2]: https://github.com/peebs/gzran/tree/gzran
