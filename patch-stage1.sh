@@ -12,8 +12,8 @@ go_version_minor="${go_version#$go_version_major.}"
 # Add a go.mod file.
 # Move the compress/flate package to internal/flate.
 # Move the compress/gzip package to the root.
-# Replace all occurences of `"compress/flate"` to `"github.com/lel-amri/zran/internal/flate"`.
-# Replace all occurences of `"compress/gzip"` to `"github.com/lel-amri/zran"`.
+# Replace all occurences of `"compress/flate"` to `"golang.ardurien.org/zran/internal/flate"`.
+# Replace all occurences of `"compress/gzip"` to `"golang.ardurien.org/zran"`.
 # Remove references to internal/testenv.
 
 cp -R src/compress/gzip/* .
@@ -24,9 +24,9 @@ mkdir testdata 2>/dev/null || :
 cp -R src/testdata/* testdata
 rm -r src
 cat >go.mod <<EOF
-module github.com/lel-amri/zran
+module golang.ardurien.org/zran
 
 go $go_version
 EOF
-find . \( \! -path './.git/*' -type f -name '*.go' \) -exec sed -i -e 's~"compress/gzip"~"github.com/lel-amri/zran"~' -e 's~"compress/flate"~"github.com/lel-amri/zran/internal/flate"~' -e 's~testenv\.Builder()~""~' -e 's~testenv\.HasSrc()~false~' {} +
+find . \( \! -path './.git/*' -type f -name '*.go' \) -exec sed -i -e 's~"compress/gzip"~"golang.ardurien.org/zran"~' -e 's~"compress/flate"~"golang.ardurien.org/zran/internal/flate"~' -e 's~testenv\.Builder()~""~' -e 's~testenv\.HasSrc()~false~' {} +
 find . \( \! -path './.git/*' -type f -name '*.go' \) -exec "$GOPLS" imports -w {} \;
