@@ -28,5 +28,5 @@ module github.com/lel-amri/zran
 
 go $go_version
 EOF
-find . \( \! -path './.git/*' -type f -name '*.go' \) -exec sed -i -e 's~"compress/gzip"~"github.com/lel-amri/zran"~' -e 's~"compress/flate"~"github.com/lel-amri/zran/internal/flate"~' -e 's~testenv\.Builder() == ""~true~' -e 's~testenv\.HasSrc()~false~' {} +
+find . \( \! -path './.git/*' -type f -name '*.go' \) -exec sed -i -e 's~"compress/gzip"~"github.com/lel-amri/zran"~' -e 's~"compress/flate"~"github.com/lel-amri/zran/internal/flate"~' -e 's~testenv\.Builder()~""~' -e 's~testenv\.HasSrc()~false~' {} +
 find . \( \! -path './.git/*' -type f -name '*.go' \) -exec "$GOPLS" imports -w {} \;
